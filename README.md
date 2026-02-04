@@ -3,7 +3,7 @@
 A Flask-based e-commerce application with integrated security assessments and vulnerability demonstrations for educational purposes. This project is designed to help developers and security professionals understand common web application vulnerabilities in a hands-on, practical environment.
 
 [![Flask](https://img.shields.io/badge/Flask-2.x-blue.svg)](https://flask.palletsprojects.com/)
-[![Python](https://img.shields.io/badge/Python-3.8+-green.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## 📋 Table of Contents
@@ -69,7 +69,7 @@ This application intentionally includes the following security vulnerabilities f
 
 Before you begin, ensure you have the following installed:
 
-- **Python 3.8+**: [Download Python](https://www.python.org/downloads/)
+- **Python 3.10+**: [Download Python](https://www.python.org/downloads/)
 - **pip**: Python package installer (usually included with Python)
 - **Git**: [Download Git](https://git-scm.com/downloads)
 - **Docker** (optional): [Download Docker](https://www.docker.com/get-started)
@@ -161,7 +161,7 @@ Using Docker simplifies the setup process and ensures consistency across differe
 
 **Dockerfile Example:**
 ```dockerfile
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -183,7 +183,7 @@ ENV FLASK_ENV=development
 CMD ["flask", "run", "--host=0.0.0.0"]
 ```
 
-**docker-compose.yml Example:**
+**docker-compose.yml Example (SQLite - Simpler Setup):**
 ```yaml
 version: '3.8'
 
@@ -195,6 +195,26 @@ services:
     environment:
       - FLASK_ENV=development
       - DATABASE_URL=sqlite:///ecommerce.db
+    volumes:
+      - .:/app
+      - sqlite_data:/app/instance
+    
+volumes:
+  sqlite_data:
+```
+
+**docker-compose.yml Example (PostgreSQL - Production-like Setup):**
+```yaml
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://ecommerce:ecommerce@db:5432/ecommerce_db
     volumes:
       - .:/app
     depends_on:
@@ -228,7 +248,10 @@ volumes:
 
 ### Admin User Flow
 
-1. **Login with admin credentials** (default: admin/admin)
+1. **Login with admin credentials**
+   - ⚠️ **CRITICAL SECURITY WARNING**: Default credentials (admin/admin) are for initial setup ONLY
+   - IMMEDIATELY change these credentials after first login
+   - NEVER use default credentials in any real scenario
 2. **Access admin panel** at `/admin`
 3. **Manage products**: Add, edit, or delete products
 4. **View all orders**: Monitor customer orders
