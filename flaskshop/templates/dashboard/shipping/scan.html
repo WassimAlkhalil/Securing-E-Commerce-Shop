@@ -1,0 +1,80 @@
+{% extends 'dashboard/layout.html' %}
+<!--
+-- Add simulate courier side scanning template
+-- @author: Nebil Müren - cas3322
+-->
+
+{% block body %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">{% trans %}Scan Tracking Number - Courier{% endtrans %}</h4>
+                        <div class="card-tools">
+                            <a href="{{ url_for('dashboard.shipping_list') }}" class="btn btn-secondary btn-sm">
+                                <i class="fa fa-arrow-left"></i> {% trans %}Back to List{% endtrans %}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('dashboard.scan_tracking') }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                            <div class="form-group">
+                                <label for="tracking_number">{% trans %}Tracking Number{% endtrans %}</label>
+                                <input type="text" class="form-control" id="tracking_number" name="tracking_number"
+                                    value="{{ tracking_number }}"
+                                    placeholder="{% trans %}Enter or scan tracking number{% endtrans %}" required
+                                    autofocus>
+                                <small class="form-text text-muted">
+                                    {% trans %}Enter the tracking number from the QR code or label{% endtrans %}
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="action">{% trans %}Action{% endtrans %}</label>
+                                <select class="form-control" id="action" name="action" required>
+                                    <option value="">{% trans %}Select an action{% endtrans %}</option>
+                                    <option value="shipped">{% trans %}Mark as Shipped{% endtrans %}</option>
+                                    <option value="delivered">{% trans %}Mark as Delivered{% endtrans %}</option>
+                                </select>
+                                <small class="form-text text-muted">
+                                    {% trans %}What action should be taken for this scan?{% endtrans %}
+                                </small>
+                            </div><br>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-check"></i> {% trans %}Process Scan{% endtrans %}
+                                </button>
+                                <a href="{{ url_for('dashboard.shipping_list') }}" class="btn btn-secondary">
+                                    {% trans %}Cancel{% endtrans %}
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title">{% trans %}Quick Actions{% endtrans %}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">
+                            {% trans %}As a courier, you can:{% endtrans %}
+                        </p>
+                        <ul>
+                            <li>{% trans %}<strong>Mark as Shipped:</strong> Mark the package as shipped (left the
+                                facility and is on the way){%
+                                endtrans %}</li>
+                            <li>{% trans %}<strong>Mark as Delivered:</strong> Mark the package as delivered and record
+                                the delivery time{% endtrans %}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+  "save_failed": "Записът не бе успешен",
+  "save_failed_console": "Записът не бе успешен (виж конзолата).",
+  "network_error_saving_address": "Мрежова грешка при запис на адрес.",
+  "server_responded": "Сървърът отговори {{status}}"
+}

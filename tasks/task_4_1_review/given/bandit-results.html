@@ -1,0 +1,963 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Bandit Report
+</title>
+
+<style>
+
+html * {
+    font-family: "Arial", sans-serif;
+}
+
+pre {
+    font-family: "Monaco", monospace;
+}
+
+.bordered-box {
+    border: 1px solid black;
+    padding-top:.5em;
+    padding-bottom:.5em;
+    padding-left:1em;
+}
+
+.metrics-box {
+    font-size: 1.1em;
+    line-height: 130%;
+}
+
+.metrics-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: .25em;
+}
+
+.issue-description {
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.candidate-issues {
+    margin-left: 2em;
+    border-left: solid 1px; LightGray;
+    padding-left: 5%;
+    margin-top: .2em;
+    margin-bottom: .2em;
+}
+
+.issue-block {
+    border: 1px solid LightGray;
+    padding-left: .5em;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin-bottom: .5em;
+}
+
+.issue-sev-high {
+    background-color: Pink;
+}
+
+.issue-sev-medium {
+    background-color: NavajoWhite;
+}
+
+.issue-sev-low {
+    background-color: LightCyan;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="metrics">
+    <div class="metrics-box bordered-box">
+        <div class="metrics-title">
+            Metrics:<br>
+        </div>
+        Total lines of code: <span id="loc">6448</span><br>
+        Total lines skipped (#nosec): <span id="nosec">0</span>
+    </div>
+</div>
+
+
+
+
+<br>
+<div id="results">
+    
+<div id="issue-0">
+<div class="issue-block issue-sev-medium">
+    <b>request_without_timeout: </b> Call to requests without timeout<br>
+    <b>Test ID:</b> B113<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/400.html" target="_blank">CWE-400</a><br>
+    <b>File: </b><a href="./exploits/task2-4.py" target="_blank">./exploits/task2-4.py</a><br>
+    <b>Line number: </b>18<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b113_request_without_timeout.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b113_request_without_timeout.html</a><br>
+
+<div class="code">
+<pre>
+17	            url = f&quot;http://localhost:5001/account/address/edit?id={id}&quot;
+18	            response = requests.get(url)
+19	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-1">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/account/utils.py" target="_blank">./flaskshop/account/utils.py</a><br>
+    <b>Line number: </b>159<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+158	def gen_tmp_pwd(size=8, chars=string.ascii_uppercase + string.digits):
+159	    return &quot;&quot;.join(random.choice(chars) for _ in range(size))
+160	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-2">
+<div class="issue-block issue-sev-high">
+    <b>hashlib: </b> Use of weak SHA1 hash for security. Consider usedforsecurity=False<br>
+    <b>Test ID:</b> B324<br>
+    <b>Severity: </b>HIGH<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/327.html" target="_blank">CWE-327</a><br>
+    <b>File: </b><a href="./flaskshop/account/utils.py" target="_blank">./flaskshop/account/utils.py</a><br>
+    <b>Line number: </b>226<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b324_hashlib.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b324_hashlib.html</a><br>
+
+<div class="code">
+<pre>
+225	    try:
+226	        sha1 = hashlib.sha1(password.encode(&#x27;utf-8&#x27;)).hexdigest().upper()
+227	        prefix = sha1[:5]
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-3">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Consider possible security implications associated with the subprocess module.<br>
+    <b>Test ID:</b> B404<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
+    <b>File: </b><a href="./flaskshop/commands.py" target="_blank">./flaskshop/commands.py</a><br>
+    <b>Line number: </b>5<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_imports.html#b404-import-subprocess" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_imports.html#b404-import-subprocess</a><br>
+
+<div class="code">
+<pre>
+4	from pathlib import Path
+5	from subprocess import call
+6	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-4">
+<div class="issue-block issue-sev-high">
+    <b>subprocess_popen_with_shell_equals_true: </b> subprocess call with shell=True identified, security issue.<br>
+    <b>Test ID:</b> B602<br>
+    <b>Severity: </b>HIGH<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
+    <b>File: </b><a href="./flaskshop/commands.py" target="_blank">./flaskshop/commands.py</a><br>
+    <b>Line number: </b>39<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b602_subprocess_popen_with_shell_equals_true.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b602_subprocess_popen_with_shell_equals_true.html</a><br>
+
+<div class="code">
+<pre>
+38	    &quot;&quot;&quot;Run the tests.&quot;&quot;&quot;
+39	    print(call(f&quot;pytest {TEST_PATH}&quot;, shell=True))
+40	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-5">
+<div class="issue-block issue-sev-low">
+    <b>subprocess_without_shell_equals_true: </b> subprocess call - check for execution of untrusted input.<br>
+    <b>Test ID:</b> B603<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/78.html" target="_blank">CWE-78</a><br>
+    <b>File: </b><a href="./flaskshop/commands.py" target="_blank">./flaskshop/commands.py</a><br>
+    <b>Line number: </b>66<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b603_subprocess_without_shell_equals_true.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b603_subprocess_without_shell_equals_true.html</a><br>
+
+<div class="code">
+<pre>
+65	        click.echo(f&quot;{description}: {&#x27; &#x27;.join(command_line)}&quot;)
+66	        rv = call(command_line)
+67	        if rv != 0:
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-6">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Consider possible security implications associated with UnpicklingError module.<br>
+    <b>Test ID:</b> B403<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/502.html" target="_blank">CWE-502</a><br>
+    <b>File: </b><a href="./flaskshop/corelib/mc.py" target="_blank">./flaskshop/corelib/mc.py</a><br>
+    <b>Line number: </b>3<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_imports.html#b403-import-pickle" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_imports.html#b403-import-pickle</a><br>
+
+<div class="code">
+<pre>
+2	import inspect
+3	from pickle import UnpicklingError
+4	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-7">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/corelib/utils.py" target="_blank">./flaskshop/corelib/utils.py</a><br>
+    <b>Line number: </b>28<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+27	class ObjectId:
+28	    _inc = random.randint(0, 0xFFFFFF)
+29	    _inc_lock = threading.Lock()
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-8">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/discount/models.py" target="_blank">./flaskshop/discount/models.py</a><br>
+    <b>Line number: </b>52<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+51	    def generate_code(cls):
+52	        code = &quot;&quot;.join(random.choices(string.ascii_uppercase, k=16))
+53	        exist = cls.query.filter_by(code=code).first()
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-9">
+<div class="issue-block issue-sev-medium">
+    <b>markupsafe_markup_xss: </b> Potential XSS with ``markupsafe.Markup`` detected. Do not use ``Markup`` on untrusted data.<br>
+    <b>Test ID:</b> B704<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/79.html" target="_blank">CWE-79</a><br>
+    <b>File: </b><a href="./flaskshop/plugin/utils.py" target="_blank">./flaskshop/plugin/utils.py</a><br>
+    <b>Line number: </b>38<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b704_markupsafe_markup_xss.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b704_markupsafe_markup_xss.html</a><br>
+
+<div class="code">
+<pre>
+37	    if is_markup:
+38	        return Markup(result)
+39	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-10">
+<div class="issue-block issue-sev-medium">
+    <b>hardcoded_sql_expressions: </b> Possible SQL injection vector through string-based query construction.<br>
+    <b>Test ID:</b> B608<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>LOW<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank">CWE-89</a><br>
+    <b>File: </b><a href="./flaskshop/public/views.py" target="_blank">./flaskshop/public/views.py</a><br>
+    <b>Line number: </b>53<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b608_hardcoded_sql_expressions.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b608_hardcoded_sql_expressions.html</a><br>
+
+<div class="code">
+<pre>
+52	        offset = (page - 1) * per_page
+53	        sql = text(f&quot;&quot;&quot;
+54	            SELECT p.*, 
+55	                   (SELECT image FROM product_image WHERE product_id = p.id LIMIT 1) as first_image
+56	            FROM product_product p
+57	            WHERE p.title LIKE :query
+58	            ORDER BY p.id
+59	            LIMIT :per_page OFFSET :offset
+60	        &quot;&quot;&quot;)
+61	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-11">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>45<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+44	    def shipping_method(self):
+45	        return random.choice(ShippingMethod.query.all())
+46	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-12">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>241<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+240	            type_placeholders = placeholder_dir / schema[&quot;images_dir&quot;]
+241	            create_product_images(product, random.randrange(1, 5), type_placeholders)
+242	        variant_combinations = schema[&quot;variant_titles&quot;]
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-13">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>285<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+284	        &quot;description&quot;: &quot;\n\n&quot;.join(description),
+285	        &quot;is_featured&quot;: random.choice([0, 1]),
+286	    }
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-14">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>295<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+294	    for product_attribute in product_type.product_attributes:
+295	        value = random.choice(product_attribute.values)
+296	        attr_dict[str(product_attribute.id)] = str(value.id)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-15">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>306<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+305	    for dummy in range(how_many):
+306	        image_name = random.choice(list(placeholder_root.iterdir()))
+307	        image = image_name.relative_to(Config.STATIC_DIR).as_posix()
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-16">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_funcarg: </b> Possible hardcoded password: 'password'<br>
+    <b>Test ID:</b> B106<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>356<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html</a><br>
+
+<div class="code">
+<pre>
+355	    email = get_email(fake.first_name(), fake.last_name())
+356	    user, _ = User.get_or_create(
+357	        username=fake.first_name() + fake.last_name(),
+358	        email=email,
+359	        password=&quot;password&quot;,
+360	        is_active=True,
+361	    )
+362	    return user
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-17">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_funcarg: </b> Possible hardcoded password: 'admin'<br>
+    <b>Test ID:</b> B106<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>388<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html</a><br>
+
+<div class="code">
+<pre>
+387	def create_admin():
+388	    user = User.create(
+389	        username=&quot;admin&quot;, email=&quot;admin@163.com&quot;, password=&quot;admin&quot;, is_active=True
+390	    )
+391	    create_fake_address(user.id)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-18">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_funcarg: </b> Possible hardcoded password: 'op'<br>
+    <b>Test ID:</b> B106<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>396<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html</a><br>
+
+<div class="code">
+<pre>
+395	    yield f&quot;Admin {user.username} created&quot;
+396	    user = User.create(username=&quot;op&quot;, email=&quot;op@163.com&quot;, password=&quot;op&quot;, is_active=True)
+397	    UserRole.create(user_id=user.id, role_id=3)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-19">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_funcarg: </b> Possible hardcoded password: 'editor'<br>
+    <b>Test ID:</b> B106<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>399<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html</a><br>
+
+<div class="code">
+<pre>
+398	    yield f&quot;Admin {user.username} created&quot;
+399	    user = User.create(
+400	        username=&quot;editor&quot;, email=&quot;editor@163.com&quot;, password=&quot;editor&quot;, is_active=True
+401	    )
+402	    UserRole.create(user_id=user.id, role_id=2)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-20">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>501<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+500	    address = create_fake_address()
+501	    status = random.choice(list(OrderStatusKinds)).value
+502	    order_data = {
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-21">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>518<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+517	    order = Order.create(**order_data)
+518	    lines = create_order_lines(order, discounts, random.randrange(1, 5))
+519	    order.total_net = sum([line.get_total() for line in lines])
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-22">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>535<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+534	    variant = product.variant[0]
+535	    quantity = random.randrange(1, 5)
+536	    variant.quantity += quantity
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-23">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>552<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+551	def create_payment(order):
+552	    status = random.choice(list(PaymentStatusKinds)).value
+553	    payment = OrderPayment.create(
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-24">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Standard pseudo-random generators are not suitable for security/cryptographic purposes.<br>
+    <b>Test ID:</b> B311<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/330.html" target="_blank">CWE-330</a><br>
+    <b>File: </b><a href="./flaskshop/random_data.py" target="_blank">./flaskshop/random_data.py</a><br>
+    <b>Line number: </b>580<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random" target="_blank">https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random</a><br>
+
+<div class="code">
+<pre>
+579	        discount_value_type=DiscountValueTypeKinds.percent.value,
+580	        discount_value=random.choice([10, 20, 30, 40, 50]),
+581	    )
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-25">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_string: </b> Possible hardcoded password: 'not-so-secret-in-tests'<br>
+    <b>Test ID:</b> B105<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="./tests/settings.py" target="_blank">./tests/settings.py</a><br>
+    <b>Line number: </b>7<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b105_hardcoded_password_string.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b105_hardcoded_password_string.html</a><br>
+
+<div class="code">
+<pre>
+6	)
+7	SECRET_KEY = &quot;not-so-secret-in-tests&quot;
+8	BCRYPT_LOG_ROUNDS = (
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-26">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_config.py" target="_blank">./tests/test_config.py</a><br>
+    <b>Line number: </b>10<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+9	    app = create_app(ProdConfig)
+10	    assert app.config[&quot;ENV&quot;] == &quot;prod&quot;
+11	    assert app.config[&quot;FLASK_DEBUG&quot;] is False
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-27">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_config.py" target="_blank">./tests/test_config.py</a><br>
+    <b>Line number: </b>11<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+10	    assert app.config[&quot;ENV&quot;] == &quot;prod&quot;
+11	    assert app.config[&quot;FLASK_DEBUG&quot;] is False
+12	    assert app.config[&quot;DEBUG_TB_ENABLED&quot;] is False
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-28">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_config.py" target="_blank">./tests/test_config.py</a><br>
+    <b>Line number: </b>12<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+11	    assert app.config[&quot;FLASK_DEBUG&quot;] is False
+12	    assert app.config[&quot;DEBUG_TB_ENABLED&quot;] is False
+13	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-29">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_config.py" target="_blank">./tests/test_config.py</a><br>
+    <b>Line number: </b>18<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+17	    app = create_app(Config)
+18	    assert app.config[&quot;ENV&quot;] == &quot;dev&quot;
+19	    # assert app.config[&quot;FLASK_DEBUG&quot;] is True
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-30">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_database.py" target="_blank">./tests/test_database.py</a><br>
+    <b>Line number: </b>29<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+28	        user = ExampleUserModel.create(username=&quot;foo&quot;, email=&quot;foo@bar.com&quot;)
+29	        assert ExampleUserModel.get_by_id(user.id).username == &quot;foo&quot;
+30	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-31">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_database.py" target="_blank">./tests/test_database.py</a><br>
+    <b>Line number: </b>35<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+34	        user.save()
+35	        assert ExampleUserModel.get_by_id(user.id) is not None
+36	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-32">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_database.py" target="_blank">./tests/test_database.py</a><br>
+    <b>Line number: </b>42<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+41	        user.delete(commit=True)
+42	        assert ExampleUserModel.get_by_id(user.id) is None
+43	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-33">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_database.py" target="_blank">./tests/test_database.py</a><br>
+    <b>Line number: </b>59<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+58	        retrieved = db.session.execute(text(&quot;&quot;&quot;select * from testusers&quot;&quot;&quot;)).fetchone()
+59	        assert retrieved.username == expected
+60	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-34">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_database.py" target="_blank">./tests/test_database.py</a><br>
+    <b>Line number: </b>68<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+67	        &quot;&quot;&quot;Test get_by_id returns None for non-numeric argument.&quot;&quot;&quot;
+68	        assert ExampleUserModel.get_by_id(&quot;xyz&quot;) is None
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-35">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_e2e.py" target="_blank">./tests/test_e2e.py</a><br>
+    <b>Line number: </b>6<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+5	    rv = client.get(path)
+6	    assert rv.status_code == 200
+7	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-36">
+<div class="issue-block issue-sev-low">
+    <b>assert_used: </b> Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.<br>
+    <b>Test ID:</b> B101<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/703.html" target="_blank">CWE-703</a><br>
+    <b>File: </b><a href="./tests/test_e2e.py" target="_blank">./tests/test_e2e.py</a><br>
+    <b>Line number: </b>13<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html" target="_blank">https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html</a><br>
+
+<div class="code">
+<pre>
+12	        rv = client.get(&quot;/404notfound&quot;)
+13	        assert rv.status_code == 404
+14	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+</div>
+
+</body>
+</html>

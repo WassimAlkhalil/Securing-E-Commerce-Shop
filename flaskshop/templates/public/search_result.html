@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+{% block title %}{% trans %}Search results{% endtrans %}{% endblock %}
+
+
+{% block content %}
+<!-- author: Wassim Alkhalil -->
+<div class="container-fluid py-4">
+  <!-- Horizontal Filter Bar -->
+  <div class="horizontal-filters-bar mb-5">
+    <form id="unified-filter-form" method="get" class="d-flex flex-wrap gap-3 align-items-center">
+      <input type="hidden" name="q" value="{{ query }}">
+      
+      <!-- Brand Filter Button -->
+      {% if attribute_filters.get('brand', {}).get('available') %}
+      <button type="button" class="filter-dropdown-btn" data-bs-toggle="modal" data-bs-target="#brandModal">
+        {% trans %}Brand{% endtrans %} <span class="dropdown-arrow">∨</span>
+      </button>
+      {% endif %}
+      
+      <!-- Color Filter Button -->
+      {% if attribute_filters.get('color', {}).get('available') %}
+      <button type="button" class="filter-dropdown-btn" data-bs-toggle="modal" data-bs-target="#colorModal">
+        {% trans %}Color{% endtrans %} <span class="dropdown-arrow">∨</span>
+      </button>
+      {% endif %}
+      
+      <!-- Collar Filter Button -->
+      {% if attribute_filters.get('collar', {}).get('available') %}
+      <button type="button" class="filter-dropdown-btn" data-bs-toggle="modal" data-bs-target="#collarModal">
+        {% trans %}Collar{% endtrans %} <span class="dropdown-arrow">∨</span>
+      </button>
+      {% endif %}
+      
+      <!-- Price Filter Button -->
+      <button type="button" class="filter-dropdown-btn" data-bs-toggle="modal" data-bs-target="#priceModal">
+        {% trans %}Price{% endtrans %} <span class="dropdown-arrow">∨</span>
+      </button>
+    </form>
+  </div>
+
+  <div class="container-fluid">
+    <!-- Products Section -->
+    {% if query %}
+    <div class="mb-5 pb-4 border-bottom">
+      <h1 class="h3 mb-2" style="font-weight: 600; color: #1a1a1a;">
+        {% trans %}Search Results for:{% endtrans %} <span style="color: #0066ff;">"{{ query }}"</span>
+      </h1>
+      {% if pagination.total %}
+      <p class="text-muted mb-0" style="font-size: 14px;">
+        <!-- author: Wassim Alkhalil -->
+        <!-- Handles singular and plural forms for product count -->
+        {% if pagination.total == 1 %}
+          {% trans %}1 product found{% endtrans %}
+        {% else %}
+          {{ pagination.total }} {% trans %}products found{% endtrans %}
+        {% endif %}
+      </p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if query and pagination.items %}
+      <div class="row g-4 mb-5">
+        {% include "products/_items.html" %}
+      </div>
+      
+      {% if pagination.pages > 1 %}
+      <nav class="mt-5 pt-5 border-top" aria-label="Page navigation">
+        {{ render_pagination(pagination) }}
+      </nav>
+      {% endif %}
+    {% else %}
+      <div class="row no-results">
+        <div class="col-12 text-center py-5">
+          <h3 style="font-weight: 600; color: #1a1a1a;">{% trans %}No Results Found{% endtrans %}</h3>
+          <p class="text-muted">{% trans %}Sorry, we couldn't find any products matching your search criteria.{% endtrans %}</p>
+          <p class="text-muted">{% trans %}Try adjusting your filters or search for different keywords.{% endtrans %}</p>
+          {% if attribute_filters.brand.selected or attribute_filters.color.selected or attribute_filters.collar.selected or price_from or price_to %}
+          <a href="{{ url_for('public.search', q=query) }}" class="btn btn-primary mt-3">{% trans %}Clear All Filters{% endtrans %}</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Filter Modals -->
+
+<!-- Brand Filter Modal -->
+{% if attribute_filters.get('brand', {}).get('available') %}
+<div class="modal fade" id="brandModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% trans %}Select Brand{% endtrans %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="brand-filter-form">
+          {% for value in attribute_filters.brand.available %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="brand" value="{{ value }}" 
+                     id="brand_{{ loop.index }}" 
+                     {% if value in attribute_filters.brand.selected %}checked{% endif %}>
+              <label class="form-check-label" for="brand_{{ loop.index }}">{{ value }}</label>
+            </div>
+          {% endfor %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+        <button type="button" class="btn btn-primary" onclick="submitBrandFilter()">{% trans %}Apply{% endtrans %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Color Filter Modal -->
+{% if attribute_filters.get('color', {}).get('available') %}
+<div class="modal fade" id="colorModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% trans %}Select Color{% endtrans %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="color-filter-form">
+          {% for value in attribute_filters.color.available %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="color" value="{{ value }}" 
+                     id="color_{{ loop.index }}"
+                     {% if value in attribute_filters.color.selected %}checked{% endif %}>
+              <label class="form-check-label" for="color_{{ loop.index }}">{{ value }}</label>
+            </div>
+          {% endfor %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+        <button type="button" class="btn btn-primary" onclick="submitColorFilter()">{% trans %}Apply{% endtrans %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- author: Wassim Alkhalil -->
+<!-- Collar Filter Modal -->
+{% if attribute_filters.get('collar', {}).get('available') %}
+<div class="modal fade" id="collarModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% trans %}Select Collar{% endtrans %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="collar-filter-form">
+          {% for value in attribute_filters.collar.available %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="collar" value="{{ value }}" 
+                     id="collar_{{ loop.index }}"
+                     {% if value in attribute_filters.collar.selected %}checked{% endif %}>
+              <label class="form-check-label" for="collar_{{ loop.index }}">{{ value }}</label>
+            </div>
+          {% endfor %}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+        <button type="button" class="btn btn-primary" onclick="submitCollarFilter()">{% trans %}Apply{% endtrans %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Price Filter Modal -->
+<div class="modal fade" id="priceModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{% trans %}Price Range{% endtrans %}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="price-filter-form">
+          <div class="form-group mb-3">
+            <label for="price_from">{% trans %}Minimum Price (€){% endtrans %}</label>
+            <input type="number" class="form-control" id="price_from" name="price_from" 
+                   value="{{ price_from }}" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label for="price_to">{% trans %}Maximum Price (€){% endtrans %}</label>
+            <input type="number" class="form-control" id="price_to" name="price_to" 
+                   value="{{ price_to }}" placeholder="10000" min="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans %}Cancel{% endtrans %}</button>
+        <button type="button" class="btn btn-primary" onclick="submitPriceFilter()">{% trans %}Apply{% endtrans %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- author: Wassim Alkhalil -->
+<script>
+function submitBrandFilter() {
+  const form = document.getElementById('unified-filter-form');
+  const selected = Array.from(document.getElementById('brand-filter-form').querySelectorAll('input[name="brand"]:checked')).map(x => x.value);
+  
+  // Remove existing brand inputs
+  document.querySelectorAll('input[name="brand"]').forEach(x => x.remove());
+  
+  // Add new brand inputs
+  selected.forEach(value => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'brand';
+    input.value = value;
+    form.appendChild(input);
+  });
+  
+  form.submit();
+}
+
+function submitColorFilter() {
+  const form = document.getElementById('unified-filter-form');
+  const selected = Array.from(document.getElementById('color-filter-form').querySelectorAll('input[name="color"]:checked')).map(x => x.value);
+  
+  // Remove existing color inputs
+  document.querySelectorAll('input[name="color"]').forEach(x => x.remove());
+  
+  // Add new color inputs
+  selected.forEach(value => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'color';
+    input.value = value;
+    form.appendChild(input);
+  });
+  
+  form.submit();
+}
+
+function submitCollarFilter() {
+  const form = document.getElementById('unified-filter-form');
+  const selected = Array.from(document.getElementById('collar-filter-form').querySelectorAll('input[name="collar"]:checked')).map(x => x.value);
+  
+  // Remove existing collar inputs
+  document.querySelectorAll('input[name="collar"]').forEach(x => x.remove());
+  
+  // Add new collar inputs
+  selected.forEach(value => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'collar';
+    input.value = value;
+    form.appendChild(input);
+  });
+  
+  form.submit();
+}
+
+function submitPriceFilter() {
+  const form = document.getElementById('unified-filter-form');
+  let priceFrom = parseInt(document.getElementById('price_from').value) || 0;
+  let priceTo = parseInt(document.getElementById('price_to').value) || 0;
+  
+  // Client-side validation: auto-swap if from > to
+  if (priceFrom && priceTo && priceFrom > priceTo) {
+    [priceFrom, priceTo] = [priceTo, priceFrom];
+    // Update the input fields to show the corrected values
+    document.getElementById('price_from').value = priceFrom;
+    document.getElementById('price_to').value = priceTo;
+  }
+  
+  // Remove existing price inputs
+  document.querySelectorAll('input[name="price_from"], input[name="price_to"]').forEach(x => x.remove());
+  
+  // Add new price inputs
+  if (priceFrom) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'price_from';
+    input.value = priceFrom;
+    form.appendChild(input);
+  }
+  
+  if (priceTo) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'price_to';
+    input.value = priceTo;
+    form.appendChild(input);
+  }
+  
+  form.submit();
+}
+</script>
+{% endblock content %}

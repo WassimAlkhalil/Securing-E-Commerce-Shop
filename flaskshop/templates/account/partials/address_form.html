@@ -1,0 +1,150 @@
+{% from 'bootstrap5/form.html' import render_field %}
+<!-- author: Wassim Alkhalil -->
+<!-- Address form with client-side XSS prevention -->
+<div class="i18n-address">
+  <div class="row">
+    <div class="col-6">
+      {{ render_field(form.province, class="form-control address-field") }}
+    </div>
+    <div class="col-6">
+      {{ render_field(form.city, class="form-control address-field") }}
+    </div>
+    <div class="col-6">
+      {{ render_field(form.district, class="form-control address-field") }}
+    </div>
+    <div class="col-6">
+      {{ render_field(form.address, class="form-control address-field") }}
+    </div>
+    <div class="col-6">
+      {{ render_field(form.contact_name, class="form-control address-field") }}
+    </div>
+    <div class="col-6">
+      {{ render_field(form.contact_phone, class="form-control address-field") }}
+    </div>
+  </div>
+  
+  <!-- Client-side XSS prevention -->
+  <div id="xss-warning" class="alert alert-danger mt-3" style="display: none;\">
+    <strong>{% trans %}Security Warning:{% endtrans %}</strong> 
+    {% trans %}HTML tags and scripts are not allowed in address fields.{% endtrans %}
+  </div>
+</div>
+
+<script>
+// author: Wassim Alkhalil
+// Client-side XSS prevention for address fields
+(function() {
+    'use strict';
+    
+    // Dangerous patterns that indicate XSS attempts
+    const dangerousPatterns = [
+        /<[^>]*>/gi,              // HTML tags
+        /javascript:/gi,          // JavaScript protocol
+        /on\w+\s*=/gi,            // Event handlers
+        /<script/gi,              // Script tags
+        /<\/script/gi,            // Closing script tags
+        /&lt;/gi,                 // Encoded <
+        /&gt;/gi,                 // Encoded >
+        /&#/gi,                   // HTML entities
+        /\\/gi                    // Backslash escapes
+    ];
+    
+    function containsDangerousContent(value) {
+        for (let pattern of dangerousPatterns) {
+            if (pattern.test(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function sanitizeInput(value) {
+        // Remove or escape dangerous characters
+        return value
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;');
+    }
+    
+    function validateField(field) {
+        const value = field.value;
+        const warningDiv = document.getElementById('xss-warning');
+        
+        if (containsDangerousContent(value)) {
+            field.classList.add('is-invalid');
+            warningDiv.style.display = 'block';
+            return false;
+        } else {
+            field.classList.remove('is-invalid');
+            return true;
+        }
+    }
+    
+    // Attach validation to all address fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const addressFields = document.querySelectorAll('.address-field, input[name="province"], input[name="city"], input[name="district"], input[name="address"], input[name="contact_name"], input[name="contact_phone"]');
+        const warningDiv = document.getElementById('xss-warning');
+        
+        addressFields.forEach(function(field) {
+            // Validate on input
+            field.addEventListener('input', function() {
+                let allValid = true;
+                addressFields.forEach(function(f) {
+                    if (!validateField(f)) {
+                        allValid = false;
+                    }
+                });
+                if (allValid) {
+                    warningDiv.style.display = 'none';
+                }
+            });
+            
+            // Validate on paste - prevent pasting malicious content
+            field.addEventListener('paste', function(e) {
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                if (containsDangerousContent(pastedText)) {
+                    e.preventDefault();
+                    warningDiv.style.display = 'block';
+                    field.classList.add('is-invalid');
+                    alert('{% trans %}Pasted content contains potentially dangerous characters and was blocked.{% endtrans %}');
+                }
+            });
+        });
+        
+        // Validate form before submission
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+                addressFields.forEach(function(field) {
+                    if (!validateField(field)) {
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    warningDiv.style.display = 'block';
+                    alert('{% trans %}Please remove HTML tags and scripts from the address fields.{% endtrans %}');
+                }
+            });
+        }
+    });
+})();
+</script>
+
+<style>
+/* author: Wassim Alkhalil */
+/* Styling for invalid fields */
+.address-field.is-invalid,
+input.is-invalid {
+    border-color: #dc3545 !important;
+    background-color: #fff5f5;
+}
+
+#xss-warning {
+    border-radius: 8px;
+    font-size: 14px;
+}
+</style>

@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/form.html' import render_field %}
+
+{% block title %}
+{{ product.name }}
+{% endblock %}
+{{ bootstrap.load_css() }}
+
+{% block breadcrumb %}
+<ul class="breadcrumbs list-unstyled">
+  <li>
+    <a href="{{ url_for('public.home') }}">
+      Home
+    </a>
+  </li>
+  {% if product.category %}
+  <li>
+    <a href="{{ product.category.get_absolute_url() }}">{{ product.category }}</a>
+  </li>
+  {% endif %}
+  <li>
+    <a href="{{ product.get_absolute_url() }}">{{ product }}</a>
+  </li>
+</ul>
+{% endblock breadcrumb %}
+
+{% block content %}
+
+<div class="row product">
+
+  <div class="col-md-6 col-12 product__gallery">
+    {% with images=product.images %}
+    {% if images %}
+    <div id="carousel-example-generic" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-inner" role="listbox">
+        {% for image in images %}
+        <div class="carousel-item{% if loop.first %} active{% endif %}">
+          <img class="d-block img-fluid lazyload lazypreload" alt="" src="{{ image }}" data-src="{{ image }}"
+            width=255 />
+        </div>
+        {% endfor %}
+      </div>
+      {% if images|length > 1 %}
+      <a class="carousel-control-prev" data-bs-target="#carousel-example-generic" role="button" data-bs-slide="prev">
+        <svg data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"></svg>
+      </a>
+      <a class="carousel-control-next" data-bs-target="#carousel-example-generic" role="button" data-bs-slide="next">
+        <svg data-src="{{ url_for('static', filename='img/gallery-arrow.svg') }}"></svg>
+      </a>
+
+      {% endif %}
+      <ol class="carousel-indicators d-none d-md-block">
+        {% for image in images %}
+        {% if images|length > 1 %}
+        <li data-bs-target="#carousel-example-generic" data-bs-slide-to="{{ loop.index - 1 }}" {% if loop.first %}
+          class="active" {% endif %}>
+          <img class="lazyload lazypreload" src="{{ image }}" data-src="{{ image }}">
+        </li>
+        {% endif %}
+        {% endfor %}
+      </ol>
+    </div>
+    {% else %}
+    <img alt="" class="img-fluid lazyload lazypreload">
+    {% endif %}
+    {% endwith %}
+  </div>
+  <div class="col-md-6 col-12 product__info">
+    <h1 class="product__info__name">
+      {{ product }}
+    </h1>
+
+
+    <h2 class="product__info__price">
+      <span class="text-info">$ {{product.price}}</span>
+      {% if product.is_discounted %}
+      <small class="product__info__price__undiscounted">
+        {{product.basic_price}}
+      </small>
+      {% endif %}
+      <small class="stock">
+
+      </small>
+    </h2>
+
+    {% if product.on_sale %}
+    {% block orderform %}
+    <form id="product-form" role="form" class="product-form1 clearfix" method="post"
+      action="{{ url_for('product.product_add_to_cart', id=product.id) }}">
+      {{ form.csrf_token }}
+      {% if form.variant.choices | length > 1 %}
+      <div class="variant-picker">
+        <div class="variant-picker__label">{{ form.variant.label.text|safe }}</div>
+        <div class="btn-group" role="group" aria-label="select variant">
+          {% for item in form.variant -%}
+          <input type="radio" class="btn-check variant-picker__option" name="variant" id="{{item.id}}"
+            autocomplete="off" value="{{item.data}}" required>
+          <label class="btn btn-outline-primary" for="{{item.id}}">{{ item.label.text|safe
+            }}</label>
+          {% endfor %}
+        </div>
+
+        {% if form.variant.errors %}
+        <div class="is-invalid "></div>
+        <div class="invalid-feedback">{% trans %}Please choose a variant!{% endtrans %}</div>
+        {% endif %}
+      </div>
+      {% else %}
+      {% for item in form.variant -%}
+      <label class="d-none">
+        {{ item(checked='checked')|safe }}
+      </label>
+      {% endfor %}
+      {% endif %}
+
+      <div class="product__info__quantity">
+        {{ render_field(form.quantity) }}
+      </div>
+
+      <div class="form-group product__info__button">
+        <button class="btn btn-primary" type="submit">
+          {% trans %}Add to cart{% endtrans %}
+        </button>
+      </div>
+    </form>
+
+    {% endblock %}
+    <div class="product__info__form-error">
+      <small class="text-danger"></small>
+    </div>
+
+    {% else %}
+    <p class="alert alert-warning">
+      {% trans %}This product is currently{% endtrans %} <strong>{% trans %}unavailable{% endtrans %}</strong>.
+    </p>
+    {% endif %}
+    <div class="product__info__description">
+      <h3>{% trans %}Description{% endtrans %}</h3>
+      <hr>
+      {{ product.description|safe }}
+    </div>
+    <hr>
+    <table>
+      {% for attribute, value in product.attribute_map.items() %}
+      <tr>
+        <td>{{ attribute }}:</td>
+        <td><strong>{{ value }}</strong></td>
+      </tr>
+      {% endfor %}
+    </table>
+    <!--
+        -- Add customer feedback feature
+        -- @author: Nebil Müren - cas3322
+        -->
+    <div class="product__info__reviews mt-4">
+      <h3 class="h5 mb-3">{% trans %}Customer feedback{% endtrans %}</h3>
+      <div class="d-flex flex-wrap justify-content-between align-items-end mb-3 gap-3">
+        <div>
+          {% if product.review_count %}
+          <div class="h4 mb-0">
+            {{ "%.1f"|format(product.rating) }} / 5
+          </div>
+          <small class="text-muted">
+            {{ product.review_count }} {% trans %}reviews{% endtrans %}
+          </small>
+          {% else %}
+          <p class="mb-0 text-muted">{% trans %}No feedback yet.{% endtrans %}</p>
+          {% endif %}
+        </div>
+        {% if feedbacks %}
+        <small class="text-muted">
+          {{ feedbacks|length }} {% trans %}recent rating(s){% endtrans %}
+        </small>
+        {% endif %}
+      </div>
+      {% if feedbacks %}
+      <div class="list-group list-group-flush feedback-list mb-3">
+        {% for feedback in feedbacks %}
+        <div class="list-group-item py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>{{ feedback.nickname }}</strong>
+            <small class="text-muted">{{ feedback.created_at_human }}</small>
+          </div>
+          <div class="my-2 d-flex flex-wrap gap-3 small text-muted">
+            <span>{% trans %}Packaging{% endtrans %}: <strong>{{ feedback.packaging_rating }}</strong></span>
+            <span>{% trans %}Delivery{% endtrans %}: <strong>{{ feedback.delivery_rating }}</strong></span>
+            <span>{% trans %}Item{% endtrans %}: <strong>{{ feedback.item_rating }}</strong></span>
+            <span>{% trans %}Overall{% endtrans %}: <strong>{{ "%.1f"|format(feedback.overall_rating) }}</strong></span>
+          </div>
+          {% if feedback.comment %}
+          <p class="mb-0 text-body-secondary small">
+            {{ feedback.comment }}
+          </p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <style>
+        .star-rating {
+          display: inline-flex;
+          gap: 0.25rem;
+          align-items: center;
+        }
+        .star-rating__star {
+          background: transparent;
+          border: none;
+          padding: 0;
+          font-size: 1.3rem;
+          line-height: 1;
+          color: #c7c7c7;
+          cursor: pointer;
+          transition: color 0.2s ease;
+        }
+        .star-rating__star.is-active {
+          color: #ffb400;
+        }
+        .star-rating__star:focus-visible {
+          outline: 2px solid #0056b3;
+          outline-offset: 2px;
+        }
+        .feedback-rating-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+        .feedback-rating-group span {
+          font-size: 0.85rem;
+        }
+      </style>
+      <div class="product__info__feedback-form">
+        <h4 class="h6 mb-3">{% trans %}Leave a rating{% endtrans %}</h4>
+        {% if current_user.is_authenticated %}
+        {% if already_submitted %}
+        <div class="alert alert-info small" role="status">
+          {% trans %}You have already submitted feedback for this product.{% endtrans %}
+        </div>
+        {% endif %}
+        <form method="post" action="{{ url_for('product.product_feedback', id=product.id) }}">
+          {{ feedback_form.csrf_token }}
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              {{ render_field(feedback_form.nickname, class="form-control") }}
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <div class="feedback-rating-group">
+                <span class="text-muted">{% trans %}Packaging{% endtrans %}</span>
+                <div class="star-rating" data-rating-target="{{ feedback_form.packaging_rating.id }}"
+                  data-rating-disabled="{{ 'true' if already_submitted else 'false' }}"
+                  role="radiogroup" aria-label="{% trans %}Packaging rating{% endtrans %}">
+                  {% for value in range(1, 6) %}
+                  <button type="button" class="star-rating__star" data-value="{{ value }}"
+                    aria-label="{{ value }} {% trans %}stars{% endtrans %}" aria-pressed="false">
+                    <span aria-hidden="true">★</span>
+                  </button>
+                  {% endfor %}
+                </div>
+              </div>
+              {{ feedback_form.packaging_rating(class="d-none") }}
+            </div>
+            <div class="col-md-4">
+              <div class="feedback-rating-group">
+                <span class="text-muted">{% trans %}Delivery{% endtrans %}</span>
+                <div class="star-rating" data-rating-target="{{ feedback_form.delivery_rating.id }}"
+                  data-rating-disabled="{{ 'true' if already_submitted else 'false' }}"
+                  role="radiogroup" aria-label="{% trans %}Delivery rating{% endtrans %}">
+                  {% for value in range(1, 6) %}
+                  <button type="button" class="star-rating__star" data-value="{{ value }}"
+                    aria-label="{{ value }} {% trans %}stars{% endtrans %}" aria-pressed="false">
+                    <span aria-hidden="true">★</span>
+                  </button>
+                  {% endfor %}
+                </div>
+              </div>
+              {{ feedback_form.delivery_rating(class="d-none") }}
+            </div>
+            <div class="col-md-4">
+              <div class="feedback-rating-group">
+                <span class="text-muted">{% trans %}Item quality{% endtrans %}</span>
+                <div class="star-rating" data-rating-target="{{ feedback_form.item_rating.id }}"
+                  data-rating-disabled="{{ 'true' if already_submitted else 'false' }}"
+                  role="radiogroup" aria-label="{% trans %}Item quality rating{% endtrans %}">
+                  {% for value in range(1, 6) %}
+                  <button type="button" class="star-rating__star" data-value="{{ value }}"
+                    aria-label="{{ value }} {% trans %}stars{% endtrans %}" aria-pressed="false">
+                    <span aria-hidden="true">★</span>
+                  </button>
+                  {% endfor %}
+                </div>
+              </div>
+              {{ feedback_form.item_rating(class="d-none") }}
+            </div>
+          </div>
+          <div class="mb-3">
+            {{ render_field(feedback_form.comment) }}
+          </div>
+          <button class="btn btn-outline-primary" type="submit"
+            {% if already_submitted %}disabled aria-disabled="true"{% endif %}>
+            {% trans %}Submit feedback{% endtrans %}
+          </button>
+        </form>
+        {% else %}
+        <p class="text-muted small">
+          {% trans %}Please log in to leave feedback.{% endtrans %}
+        </p>
+        {% endif %}
+      </div>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".star-rating").forEach(function (group) {
+            var targetId = group.dataset.ratingTarget;
+            if (!targetId) {
+              return;
+            }
+            var input = document.getElementById(targetId);
+            if (!input) {
+              return;
+            }
+            var stars = Array.from(group.querySelectorAll(".star-rating__star"));
+          var ratingDisabled = group.dataset.ratingDisabled === "true";
+
+            function highlight(value) {
+              stars.forEach(function (star) {
+                var starValue = Number(star.dataset.value) || 0;
+                var active = starValue <= value && starValue > 0;
+                star.classList.toggle("is-active", active);
+                star.setAttribute("aria-pressed", active.toString());
+              });
+            }
+
+            function commit(value) {
+              input.value = value;
+              highlight(value);
+            }
+
+          if (ratingDisabled) {
+            stars.forEach(function (star) {
+              star.setAttribute("disabled", "");
+              star.setAttribute("aria-disabled", "true");
+              star.tabIndex = -1;
+            });
+            highlight(Number(input.value) || 0);
+            return;
+          }
+
+            stars.forEach(function (star) {
+              var value = Number(star.dataset.value) || 0;
+              star.addEventListener("click", function () {
+                commit(value);
+              });
+              star.addEventListener("mouseenter", function () {
+                highlight(value);
+              });
+              star.addEventListener("focus", function () {
+                highlight(value);
+              });
+            });
+
+            group.addEventListener("mouseleave", function () {
+              highlight(Number(input.value) || 0);
+            });
+
+            highlight(Number(input.value) || 0);
+          });
+        });
+      </script>
+    </div>
+  </div>
+</div>
+{% endblock content %}

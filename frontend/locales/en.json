@@ -1,0 +1,6 @@
+{
+  "save_failed": "Save failed",
+  "save_failed_console": "Save failed (see console).",
+  "network_error_saving_address": "Network error while saving address.",
+  "server_responded": "Server responded {{status}}"
+}

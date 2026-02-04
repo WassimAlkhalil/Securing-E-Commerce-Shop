@@ -1,0 +1,122 @@
+{% extends 'dashboard/layout.html' %}
+<!--
+-- Add shipping detail template
+-- @author: Nebil Müren - cas3322
+-->
+{% block body %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">{% trans %}Shipping Label Details - Courier{% endtrans %}</h4>
+                        <div class="card-tools">
+                            <a href="{{ url_for('dashboard.shipping_list') }}" class="btn btn-secondary btn-sm">
+                                <i class="fa fa-arrow-left"></i> {% trans %}Back to List{% endtrans %}
+                            </a>
+                            <a href="{{ url_for('dashboard.scan_tracking', tracking_number=label.tracking_number) }}"
+                                class="btn btn-success btn-sm">
+                                {% trans %}Scan This Parcel{% endtrans %}
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>{% trans %}Tracking Information{% endtrans %}</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="40%">{% trans %}Tracking Number{% endtrans %}</th>
+                                        <td>{{ label.tracking_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{% trans %}Order ID{% endtrans %}</th>
+                                        <td>
+                                            <a href="{{ url_for('dashboard.order_detail', id=order.id) }}">
+                                                #{{ order.identity }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{% trans %}Shipping Status{% endtrans %}</th>
+                                        <td>
+                                            {{ label.ship_status_human }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h5>{% trans %}Shipping Timeline{% endtrans %}</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="40%">{% trans %}Label Created At{% endtrans %}</th>
+                                        <td>
+                                            {% if label.created_at %}
+                                            {{ label.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{% trans %}Shipped At{% endtrans %}</th>
+                                        <td>
+                                            {% if label.shipping_start_time %}
+                                            {{ label.shipping_start_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{% trans %}Delivered At{% endtrans %}</th>
+                                        <td>
+                                            {% if label.parcel_arrival_time %}
+                                            {{ label.parcel_arrival_time.strftime('%Y-%m-%d %H:%M:%S') }}
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{% trans %}Processing Duration{% endtrans %}</th>
+                                        <td>
+                                            {% set duration = label.process_duration_seconds | format_duration %}
+                                            {% if duration %}
+                                            {{ duration }}
+                                            {% else %}
+                                            <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <h5>{% trans %}QR Code{% endtrans %}</h5>
+                                {% if label.qr_code_path and order.refund and order.refund.status_human == "approved" %}
+                                <div class="text-center">
+                                    <img src="{{ label.qr_code_path }}" alt="{% trans %}Shipping QR Code{% endtrans %}"
+                                        style="max-width: 300px; border: 1px solid #ddd; padding: 10px;">
+                                    <p class="text-muted mt-2">
+                                        {% trans %}Tracking Number:{% endtrans %}
+                                        <code>{{ label.tracking_number }}</code>
+                                    </p>
+                                </div>
+                                {% else %}
+                                <p class="text-muted">{% trans %}QR code is not available for this return{%
+                                    endtrans %}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

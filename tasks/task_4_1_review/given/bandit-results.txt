@@ -1,0 +1,406 @@
+Run started:2025-12-23 20:30:38.941302+00:00
+
+Test results:
+>> Issue: [B113:request_without_timeout] Call to requests without timeout
+   Severity: Medium   Confidence: Low
+   CWE: CWE-400 (https://cwe.mitre.org/data/definitions/400.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b113_request_without_timeout.html
+   Location: ./exploits/task2-4.py:18:23
+17	            url = f"http://localhost:5001/account/address/edit?id={id}"
+18	            response = requests.get(url)
+19	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/account/utils.py:159:19
+158	def gen_tmp_pwd(size=8, chars=string.ascii_uppercase + string.digits):
+159	    return "".join(random.choice(chars) for _ in range(size))
+160	
+
+--------------------------------------------------
+>> Issue: [B324:hashlib] Use of weak SHA1 hash for security. Consider usedforsecurity=False
+   Severity: High   Confidence: High
+   CWE: CWE-327 (https://cwe.mitre.org/data/definitions/327.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b324_hashlib.html
+   Location: ./flaskshop/account/utils.py:226:15
+225	    try:
+226	        sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+227	        prefix = sha1[:5]
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: ./flaskshop/commands.py:5:0
+4	from pathlib import Path
+5	from subprocess import call
+6	
+
+--------------------------------------------------
+>> Issue: [B602:subprocess_popen_with_shell_equals_true] subprocess call with shell=True identified, security issue.
+   Severity: High   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b602_subprocess_popen_with_shell_equals_true.html
+   Location: ./flaskshop/commands.py:39:10
+38	    """Run the tests."""
+39	    print(call(f"pytest {TEST_PATH}", shell=True))
+40	
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: ./flaskshop/commands.py:66:13
+65	        click.echo(f"{description}: {' '.join(command_line)}")
+66	        rv = call(command_line)
+67	        if rv != 0:
+
+--------------------------------------------------
+>> Issue: [B403:blacklist] Consider possible security implications associated with UnpicklingError module.
+   Severity: Low   Confidence: High
+   CWE: CWE-502 (https://cwe.mitre.org/data/definitions/502.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_imports.html#b403-import-pickle
+   Location: ./flaskshop/corelib/mc.py:3:0
+2	import inspect
+3	from pickle import UnpicklingError
+4	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/corelib/utils.py:28:11
+27	class ObjectId:
+28	    _inc = random.randint(0, 0xFFFFFF)
+29	    _inc_lock = threading.Lock()
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/discount/models.py:52:23
+51	    def generate_code(cls):
+52	        code = "".join(random.choices(string.ascii_uppercase, k=16))
+53	        exist = cls.query.filter_by(code=code).first()
+
+--------------------------------------------------
+>> Issue: [B704:markupsafe_markup_xss] Potential XSS with ``markupsafe.Markup`` detected. Do not use ``Markup`` on untrusted data.
+   Severity: Medium   Confidence: High
+   CWE: CWE-79 (https://cwe.mitre.org/data/definitions/79.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b704_markupsafe_markup_xss.html
+   Location: ./flaskshop/plugin/utils.py:38:15
+37	    if is_markup:
+38	        return Markup(result)
+39	
+
+--------------------------------------------------
+>> Issue: [B608:hardcoded_sql_expressions] Possible SQL injection vector through string-based query construction.
+   Severity: Medium   Confidence: Low
+   CWE: CWE-89 (https://cwe.mitre.org/data/definitions/89.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b608_hardcoded_sql_expressions.html
+   Location: ./flaskshop/public/views.py:53:23
+52	        offset = (page - 1) * per_page
+53	        sql = text(f"""
+54	            SELECT p.*, 
+55	                   (SELECT image FROM product_image WHERE product_id = p.id LIMIT 1) as first_image
+56	            FROM product_product p
+57	            WHERE p.title LIKE :query
+58	            ORDER BY p.id
+59	            LIMIT :per_page OFFSET :offset
+60	        """)
+61	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:45:15
+44	    def shipping_method(self):
+45	        return random.choice(ShippingMethod.query.all())
+46	
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:241:43
+240	            type_placeholders = placeholder_dir / schema["images_dir"]
+241	            create_product_images(product, random.randrange(1, 5), type_placeholders)
+242	        variant_combinations = schema["variant_titles"]
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:285:23
+284	        "description": "\n\n".join(description),
+285	        "is_featured": random.choice([0, 1]),
+286	    }
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:295:16
+294	    for product_attribute in product_type.product_attributes:
+295	        value = random.choice(product_attribute.values)
+296	        attr_dict[str(product_attribute.id)] = str(value.id)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:306:21
+305	    for dummy in range(how_many):
+306	        image_name = random.choice(list(placeholder_root.iterdir()))
+307	        image = image_name.relative_to(Config.STATIC_DIR).as_posix()
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'password'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html
+   Location: ./flaskshop/random_data.py:356:14
+355	    email = get_email(fake.first_name(), fake.last_name())
+356	    user, _ = User.get_or_create(
+357	        username=fake.first_name() + fake.last_name(),
+358	        email=email,
+359	        password="password",
+360	        is_active=True,
+361	    )
+362	    return user
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'admin'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html
+   Location: ./flaskshop/random_data.py:388:11
+387	def create_admin():
+388	    user = User.create(
+389	        username="admin", email="admin@163.com", password="admin", is_active=True
+390	    )
+391	    create_fake_address(user.id)
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'op'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html
+   Location: ./flaskshop/random_data.py:396:11
+395	    yield f"Admin {user.username} created"
+396	    user = User.create(username="op", email="op@163.com", password="op", is_active=True)
+397	    UserRole.create(user_id=user.id, role_id=3)
+
+--------------------------------------------------
+>> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded password: 'editor'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b106_hardcoded_password_funcarg.html
+   Location: ./flaskshop/random_data.py:399:11
+398	    yield f"Admin {user.username} created"
+399	    user = User.create(
+400	        username="editor", email="editor@163.com", password="editor", is_active=True
+401	    )
+402	    UserRole.create(user_id=user.id, role_id=2)
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:501:13
+500	    address = create_fake_address()
+501	    status = random.choice(list(OrderStatusKinds)).value
+502	    order_data = {
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:518:49
+517	    order = Order.create(**order_data)
+518	    lines = create_order_lines(order, discounts, random.randrange(1, 5))
+519	    order.total_net = sum([line.get_total() for line in lines])
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:535:15
+534	    variant = product.variant[0]
+535	    quantity = random.randrange(1, 5)
+536	    variant.quantity += quantity
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:552:13
+551	def create_payment(order):
+552	    status = random.choice(list(PaymentStatusKinds)).value
+553	    payment = OrderPayment.create(
+
+--------------------------------------------------
+>> Issue: [B311:blacklist] Standard pseudo-random generators are not suitable for security/cryptographic purposes.
+   Severity: Low   Confidence: High
+   CWE: CWE-330 (https://cwe.mitre.org/data/definitions/330.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/blacklists/blacklist_calls.html#b311-random
+   Location: ./flaskshop/random_data.py:580:23
+579	        discount_value_type=DiscountValueTypeKinds.percent.value,
+580	        discount_value=random.choice([10, 20, 30, 40, 50]),
+581	    )
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'not-so-secret-in-tests'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b105_hardcoded_password_string.html
+   Location: ./tests/settings.py:7:13
+6	)
+7	SECRET_KEY = "not-so-secret-in-tests"
+8	BCRYPT_LOG_ROUNDS = (
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_config.py:10:4
+9	    app = create_app(ProdConfig)
+10	    assert app.config["ENV"] == "prod"
+11	    assert app.config["FLASK_DEBUG"] is False
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_config.py:11:4
+10	    assert app.config["ENV"] == "prod"
+11	    assert app.config["FLASK_DEBUG"] is False
+12	    assert app.config["DEBUG_TB_ENABLED"] is False
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_config.py:12:4
+11	    assert app.config["FLASK_DEBUG"] is False
+12	    assert app.config["DEBUG_TB_ENABLED"] is False
+13	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_config.py:18:4
+17	    app = create_app(Config)
+18	    assert app.config["ENV"] == "dev"
+19	    # assert app.config["FLASK_DEBUG"] is True
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_database.py:29:8
+28	        user = ExampleUserModel.create(username="foo", email="foo@bar.com")
+29	        assert ExampleUserModel.get_by_id(user.id).username == "foo"
+30	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_database.py:35:8
+34	        user.save()
+35	        assert ExampleUserModel.get_by_id(user.id) is not None
+36	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_database.py:42:8
+41	        user.delete(commit=True)
+42	        assert ExampleUserModel.get_by_id(user.id) is None
+43	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_database.py:59:8
+58	        retrieved = db.session.execute(text("""select * from testusers""")).fetchone()
+59	        assert retrieved.username == expected
+60	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_database.py:68:8
+67	        """Test get_by_id returns None for non-numeric argument."""
+68	        assert ExampleUserModel.get_by_id("xyz") is None
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_e2e.py:6:4
+5	    rv = client.get(path)
+6	    assert rv.status_code == 200
+7	
+
+--------------------------------------------------
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.2/plugins/b101_assert_used.html
+   Location: ./tests/test_e2e.py:13:8
+12	        rv = client.get("/404notfound")
+13	        assert rv.status_code == 404
+14	
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 6448
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 32
+		Medium: 3
+		High: 2
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 2
+		Medium: 5
+		High: 30
+Files skipped (0):

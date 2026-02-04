@@ -1,0 +1,51 @@
+{% from 'bootstrap5/form.html' import render_field %}
+<form method="post" action="" id="loginForm" novalidate>
+  <fieldset>
+    {{ form.csrf_token }}
+    {{ render_field(form.username) }}
+    {% if not reset %}
+    {{ render_field(form.password) }}
+    {% if show_2fa %}
+    <!-- author: Wassim Alkhalil -->
+    <!-- Inform user about 2FA code or backup code entry. -->
+    <div class="alert alert-info">
+      <small>{% trans %}Enter your 6-digit authenticator code or an 8-character backup code{% endtrans %}</small>
+    </div>
+    {{ render_field(form.totp_code) }}
+    {% endif %}
+    {% endif %}
+  </fieldset>
+  <div class="row login__btn-group">
+    <div class="col-sm-12">
+      <button class="btn btn-primary narrow" type="submit">
+        {% if not reset %}
+        {% trans %}Log in{% endtrans %}
+        {% else %}
+        {% trans %}Reset Password{% endtrans %}
+        {% endif %}
+      </button>
+      <!-- author: Wassim Alkhalil -->
+      {% if not reset and not show_2fa %}
+      <a rel="nofollow" class="link--styled" href="{{ url_for('account.resetpwd') }}">
+        {% trans %}Forgot password?{% endtrans %}
+      </a>
+      {% endif %}
+      <hr>
+      <div class="row">
+        <div class="col-sm-6 col-md-12 col-xl-6">
+          <a class="btn social-btn facebook" href="">
+            <svg data-src="{{ url_for('static', filename='img/facebook-logo.svg') }}" width="18" height="18" />
+            <small>Facebook</small>
+          </a>
+        </div>
+        <div class="col-sm-6 col-md-12 col-xl-6">
+          <a class="btn social-btn google" href="">
+            <svg data-src="{{ url_for('static', filename='img/google-logo.svg') }}" width="18" height="18" />
+            <small>Google</small>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</form>

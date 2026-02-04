@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+{% from 'bootstrap5/pagination.html' import render_pagination %}
+
+{% block title %}
+    {{ object.name }}
+{% endblock %}
+
+
+{% block breadcrumb %}
+    <div class="row">
+        <div class="col-md-7">
+            <ul class="breadcrumbs list-unstyled d-none d-md-block">
+                {% block breadcrumb_part %}{% endblock %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block topcontent %}
+    {% if object.background_img %}
+        <div class="row" id="product-list-image" style="background-image: url('{{ object.background_img_url }}')"></div>
+    {% endif %}
+{% endblock topcontent %}
+
+{% block content %}
+<div id="product-list-page" class="container-fluid py-4">
+    <div class="row">
+        <!-- author: Wassim Alkhalil -->
+        <!-- Filter Sidebar -->
+        <div class="col-lg-3 col-md-4">
+            <h3 class="d-md-none filters-toggle">{% trans %}Filters{% endtrans %}</h3>
+            <!-- Filter Section -->
+            <div class="filters-panel">
+                <h4>{% trans %}Refine Results{% endtrans %}</h4>
+                
+                <!-- Price Range Filter -->
+                <div class="filter-section">
+                    <h5>{% trans %}Price Range{% endtrans %}</h5>
+                    <form id="price-filter-form" method="get">
+                        <div class="form-group">
+                            <label for="price_from">{% trans %}Minimum Price (€){% endtrans %}</label>
+                            <input type="number" class="form-control" id="price_from" name="price_from" 
+                                   value="{{ price_from }}" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="price_to">{% trans %}Maximum Price (€){% endtrans %}</label>
+                            <input type="number" class="form-control" id="price_to" name="price_to" 
+                                   value="{{ price_to }}" placeholder="10000" min="0">
+                        </div>
+                        <button type="submit" class="btn btn-primary">{% trans %}Apply Price Filter{% endtrans %}</button>
+                        {% if price_from or price_to %}
+                            <a href="{{ request.url.split('?')[0] }}" class="btn btn-outline-secondary">{% trans %}Reset{% endtrans %}</a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <!-- Brand Filter -->
+                {% if brand.available %}
+                <div class="filter-section">
+                    <h5>{% trans %}Brand{% endtrans %}</h5>
+                    <form id="brand-filter-form" method="get">
+                        {% if price_from %}<input type="hidden" name="price_from" value="{{ price_from }}">{% endif %}
+                        {% if price_to %}<input type="hidden" name="price_to" value="{{ price_to }}">{% endif %}
+                        {% for value in brand.available %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="brand" value="{{ value }}" 
+                                       id="brand_{{ loop.index }}" 
+                                       {% if value in brand.selected %}checked{% endif %}
+                                       onchange="document.getElementById('brand-filter-form').submit()">
+                                <label class="form-check-label" for="brand_{{ loop.index }}">{{ value }}</label>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+                {% endif %}
+
+                <!-- Color Filter -->
+                {% if color.available %}
+                <div class="filter-section">
+                    <h5>{% trans %}Color{% endtrans %}</h5>
+                    <form id="color-filter-form" method="get">
+                        {% if price_from %}<input type="hidden" name="price_from" value="{{ price_from }}">{% endif %}
+                        {% if price_to %}<input type="hidden" name="price_to" value="{{ price_to }}">{% endif %}
+                        {% for brand_val in brand.selected %}<input type="hidden" name="brand" value="{{ brand_val }}">{% endfor %}
+                        {% for value in color.available %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="color" value="{{ value }}" 
+                                       id="color_{{ loop.index }}"
+                                       {% if value in color.selected %}checked{% endif %}
+                                       onchange="document.getElementById('color-filter-form').submit()">
+                                <label class="form-check-label" for="color_{{ loop.index }}">{{ value }}</label>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+                {% endif %}
+
+                <!-- Collar Filter -->
+                {% if collar.available %}
+                <div class="filter-section mb-3">
+                    <h5>{% trans %}Collar{% endtrans %}</h5>
+                    <form id="collar-filter-form" method="get">
+                        {% if price_from %}<input type="hidden" name="price_from" value="{{ price_from }}">{% endif %}
+                        {% if price_to %}<input type="hidden" name="price_to" value="{{ price_to }}">{% endif %}
+                        {% for brand_val in brand.selected %}<input type="hidden" name="brand" value="{{ brand_val }}">{% endfor %}
+                        {% for color_val in color.selected %}<input type="hidden" name="color" value="{{ color_val }}">{% endfor %}
+                        {% for value in collar.available %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="collar" value="{{ value }}" 
+                                       id="collar_{{ loop.index }}"
+                                       {% if value in collar.selected %}checked{% endif %}
+                                       onchange="document.getElementById('collar-filter-form').submit()">
+                                <label class="form-check-label" for="collar_{{ loop.index }}">{{ value }}</label>
+                            </div>
+                        {% endfor %}
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="col-lg-9 col-md-8 product-list">
+            <div class="product-list__header">
+                <div class="product-list__header__title mb-4">
+                    <h1 class="h3 mb-2">
+                        <strong>{{ object }}</strong>
+                    </h1>
+                    {% block title_tree %}{% endblock title_tree %}
+                </div>
+                
+                <!-- author: Wassim Alkhalil -->
+                <!-- Sorting Options -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="results-info">
+                        <span class="results-count">{{ pagination.total }} {% trans %}products{% endtrans %}</span>
+                    </div>
+                    <div class="sort-by" id="sort-container">
+                        <button type="button" class="sort-trigger" onclick="toggleSortList()" aria-expanded="false" aria-haspopup="true">
+                            <svg class="sort-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M6 12h12M9 18h6"></path>
+                            </svg>
+                            <span class="sort-label">{% trans %}Sort by{% endtrans %}:</span>
+                            <span class="sort-value">
+                                {% if now_sorted_by == 'title' %}
+                                    {% trans %}Name{% endtrans %}
+                                {% elif now_sorted_by == 'basic_price' %}
+                                    {% trans %}Price{% endtrans %}
+                                {% endif %}
+                            </span>
+                            <svg class="chevron-icon {% if is_descending %}desc{% endif %}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div class="sort-dropdown" id="sort-list">
+                            <div class="sort-dropdown-header">
+                                <span>{% trans %}Sort Options{% endtrans %}</span>
+                            </div>
+                            {% for choice, label in sort_by_choices.items() %}
+                                <div class="sort-option">
+                                    <div class="sort-option-label">
+                                        {% if choice == 'title' %}
+                                            <svg class="option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18M3 12h12M3 18h6"></path>
+                                            </svg>
+                                        {% else %}
+                                            <span class="euro-icon">€</span>
+                                        {% endif %}
+                                        <span>{{ label }}</span>
+                                    </div>
+                                    <div class="sort-option-actions">
+                                        <a href="{{ get_sort_by_url(choice) }}" class="sort-btn {% if now_sorted_by == choice and not is_descending %}active{% endif %}" title="{% trans %}Ascending{% endtrans %}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 19V5M5 12l7-7 7 7"></path>
+                                            </svg>
+                                            <span>{% if choice == 'title' %}A-Z{% else %}{% trans %}Low{% endtrans %}{% endif %}</span>
+                                        </a>
+                                        <a href="{{ get_sort_by_url(choice, descending=True) }}" class="sort-btn {% if now_sorted_by == choice and is_descending %}active{% endif %}" title="{% trans %}Descending{% endtrans %}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 5v14M19 12l-7 7-7-7"></path>
+                                            </svg>
+                                            <span>{% if choice == 'title' %}Z-A{% else %}{% trans %}High{% endtrans %}{% endif %}</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- author: Wassim Alkhalil -->
+                <script>
+                function toggleSortList() {
+                    const sortList = document.getElementById('sort-list');
+                    const trigger = document.querySelector('.sort-trigger');
+                    const isExpanded = sortList.classList.toggle('show');
+                    trigger.setAttribute('aria-expanded', isExpanded);
+                }
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    const sortContainer = document.getElementById('sort-container');
+                    const sortList = document.getElementById('sort-list');
+                    const trigger = document.querySelector('.sort-trigger');
+                    if (sortContainer && !sortContainer.contains(event.target)) {
+                        sortList.classList.remove('show');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Close on Escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        const sortList = document.getElementById('sort-list');
+                        const trigger = document.querySelector('.sort-trigger');
+                        sortList.classList.remove('show');
+                        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                </script>
+                
+                <!-- author: Wassim Alkhalil -->
+                <!-- Products Grid or No Results -->
+                {% if products %}
+                    <div class="row g-4">
+                        {% include "products/_items.html" %}
+                    </div>
+                    
+                    {% if products|length >= 16 and pagination.pages > 1 %}
+                    <nav class="mt-5" aria-label="Page navigation">
+                        {{ render_pagination(pagination) }}
+                    </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <h3 class="h5 text-muted">{% trans %}No Products Found{% endtrans %}</h3>
+                        <p class="text-muted">{% trans %}Try adjusting your filters to find what you're looking for.{% endtrans %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

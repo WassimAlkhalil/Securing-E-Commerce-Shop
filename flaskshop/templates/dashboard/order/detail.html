@@ -1,0 +1,206 @@
+{% extends 'dashboard/layout.html' %}
+
+{% block body %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="invoice p-3 mb-3">
+                    <!-- title row -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h4>
+                                <i class="fa fa-globe"></i> {{order.token}}
+                                <small class="float-right">{% trans %}Created At{% endtrans %}:
+                                    {{order.created_at}}</small>
+                            </h4>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- info row -->
+                    <div class="row invoice-info">
+                        <div class="col-sm-4 invoice-col">
+                            <b>{% trans %}Status{% endtrans %}:</b> {{order.status_human}}<br>
+                            <b>{% trans %}Payment Status{% endtrans %}:</b> {{order.payment.status_human}}<br>
+                            <b>{% trans %}Payment Due{% endtrans %}:</b> {{order.payment.paid_at}}<br>
+                            <b>{% trans %}Account{% endtrans %}:</b> {{order.user}}
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+                            <strong>{% trans %}Shipping Address{% endtrans %}</strong>
+                            <address>
+                                <!-- @author: Wassim Alkhalil -->
+                                <!-- removed | safe filter to enable auto-escaping -->
+                                {{order.shipping_address}}
+                            </address>
+                        </div>
+                        <div class="col-sm-4 invoice-col">
+                            <strong>{% trans %}Shipping Method{% endtrans %}</strong>
+                            <address>
+                                {{order.shipping_method_name}} (${{order.shipping_price_net}})
+                            </address>
+                        </div>
+                    </div>
+                    <!-- /.row -->
+
+                    <!-- Table row -->
+                    <div class="row">
+                        <div class="col-12 table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans %}Qty{% endtrans %}</th>
+                                        <th>{% trans %}Product{% endtrans %}</th>
+                                        <th>{% trans %}SKU{% endtrans %}</th>
+                                        <th>{% trans %}Unit Price{% endtrans %}</th>
+                                        <th>{% trans %}Subtotal){% endtrans %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.lines %}
+                                    <tr>
+                                        <td>{{item.quantity}}</td>
+                                        <td>
+                                            <a href="{{url_for('dashboard.product_detail', id=item.product_id)}}"
+                                                target="_blank">
+                                                {{item.product_name}}
+                                            </a>
+                                        </td>
+                                        <td>{{item.product_sku}}</td>
+                                        <td>${{item.unit_price_net}}</td>
+                                        <td>${{item.quantity * item.unit_price_net}}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+
+                    <div class="row">
+                        <!-- accepted payments column -->
+                        <div class="col-6">
+                            <p class="lead">{% trans %}Payment Method{% endtrans %}: {{order.payment.payment_method}}
+                            </p>
+                            <p class="lead">{% trans %}Order Note{% endtrans %}:</p>
+                            <p class="text-muted">
+                                {{order.note.content}}
+                            </p>
+                            <!--
+                            -- Add return actions to customer side
+                            -- @author: Nebil Müren - cas3322
+                            -->
+                            {% if order_returns %}
+                            <hr>
+                            <p class="lead">{% trans %}Return & Refund{% endtrans %}</p>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans %}Status{% endtrans %}</th>
+                                        <th>{% trans %}Reason{% endtrans %}</th>
+                                        <th>{% trans %}Refund Amount{% endtrans %}</th>
+                                        <th>{% trans %}Return Shipment Status{% endtrans %}</th>
+                                        <th>{% trans %}Actions{% endtrans %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for r in order_returns %}
+                                    <tr>
+                                        <td>{{ r.status_human }}</td>
+                                        <td>{{ r.reason }}</td>
+                                        <td>${{ r.refund_amount }}</td>
+                                        <td>
+                                            {% if shipping_label %}
+                                            {{ shipping_label.ship_status_human }}
+                                            {% else %}
+                                            -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if r.status_human in ["requested", "approved"] and order.status_human in
+                                            ["shipped", "completed"] %}
+                                            <div style="display: flex; gap: 5px; align-items: center;">
+                                                <form action="{{ url_for('dashboard.refund_return', id=r.id) }}" method="post" style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-warning btn-sm">
+                                                        {% trans %}Refund{% endtrans %}
+                                                    </button>
+                                                    </form>
+                                                    {% if r.status_human != "approved" and order.status_human == "completed" %}
+                                                    <form action="{{ url_for('dashboard.approve_return', id=r.id) }}" method="post" style="display: inline;">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                            {% trans %}Approve{% endtrans %}
+                                                    </button>
+                                                    </form>
+                                                    {% endif %}
+                                                <form action="{{ url_for('dashboard.reject_return', id=r.id) }}" method="post" style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        {% trans %}Reject{% endtrans %}
+                                                    </button>
+                                                    </form>
+                                                    </div>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-6">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <tr>
+                                        <th class="w-50">{% trans %}Subtotal{% endtrans %}:</th>
+                                        <td>${{order.total_net}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{% trans %}Shipping{% endtrans %}:</th>
+                                        <td>${{order.shipping_price_net}}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>{% trans %}Discount{% endtrans %}:</th>
+                                        <td>-${{ order.discount_amount }}({{ order.discount_name }})</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>{% trans %}Total{% endtrans %}:</th>
+                                        <td>${{order.total}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+
+                    <div class="row no-print">
+                        <div class="col-12">
+                            {% if order.status_human == "fulfilled" %}
+                            <form action="{{url_for('dashboard.send_order', id=order.id)}}" method="post">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa fa-credit-card"></i> {% trans %}Send Order{% endtrans %}
+                                </button>
+                                </form>
+                            {% elif order.status_human == "unfulfilled" %}
+                            <form action="{{url_for('dashboard.draft_order', id=order.id)}}" method="post">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-ban"></i>{% trans %}Draft Order{% endtrans %}
+                                </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+{% endblock %}

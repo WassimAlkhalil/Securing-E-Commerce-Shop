@@ -1,0 +1,343 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Order {{ order }}
+{% endblock %}
+
+{% block breadcrumb %}
+<ul class="breadcrumbs list-unstyled">
+    <li>
+        <a href="{{ url_for('public.home') }}">
+            {% trans %}Home{% endtrans %}
+        </a>
+    </li>
+    <li>
+        <a href="{{ url_for('account.index') }}">
+            {% trans %}Your account{% endtrans %}
+        </a>
+    </li>
+    <li>
+        <a href="{{ order.get_absolute_url() }}">
+            {% trans %}Order{% endtrans %} {{ order }}
+        </a>
+    </li>
+</ul>
+{% endblock breadcrumb %}
+
+
+
+{% block content %}
+
+<div class="row order-details">
+    <div class="col-lg-10 m-auto">
+        <h2 class="order-details__header">
+            {% trans %}Order{% endtrans %}: {{ order.token }}<br>
+            {% trans %}Order Status{% endtrans %}: {{ order.status_human }}<br>
+            <!--
+            -- Add more detailed status for customer flow
+            -- @author: Nebil Müren - cas3322
+            -->
+            {% if order.payment %}
+            {% trans %}Payment Status{% endtrans %}: {{ order.payment.status_human }}<br>
+            {% endif %}
+            {% if order.refund %}
+            {% trans %}Return & Refund Status{% endtrans %}: {{ order.refund.status_human }}<br>
+            {% endif %}
+        </h2>
+        <!--
+        -- Add refund process visualization
+        -- @author: Nebil Müren - cas3322
+        -->
+        {% if order.refund %}
+        <div class="mt-4 mb-4">
+            <h3 class="h5 mb-4">{% trans %}Return Shipment Progress{% endtrans %}</h3>
+            <div class="stepper-wrapper">
+                <!-- Step 1: Return Requested -->
+                <div class="stepper-item {% if order.refund %}completed{% else %}active{% endif %}">
+                    <div class="stepper-counter">
+                        {% if order.refund %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z"
+                                fill="currentColor" />
+                        </svg>
+                        {% else %}
+                        <span>1</span>
+                        {% endif %}
+                    </div>
+                    <div class="stepper-title">{% trans %}Return Requested{% endtrans %}</div>
+                    {% if order.refund and order.refund.created_at %}
+                    <div class="stepper-date" data-iso="{{ order.refund.created_at.isoformat() }}">-</div>
+                    {% endif %}
+                </div>
+                <!-- Step 2: Request Waiting Approval / Request Approved / Request Rejected -->
+                <div
+                    class="stepper-item {% if order.refund and order.refund.status_human == 'rejected' %}rejected{% elif order.refund and order.refund.status_human in ['approved', 'completed'] %}completed{% elif order.refund and order.refund.status_human == 'requested' %}active{% endif %}">
+                    <div class="stepper-counter">
+                        {% if order.refund and order.refund.status_human == 'rejected' %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M15.7071 4.29289C16.0976 4.68342 16.0976 5.31658 15.7071 5.70711L11.4142 10L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L10 11.4142L5.70711 15.7071C5.31658 16.0976 4.68342 16.0976 4.29289 15.7071C3.90237 15.3166 3.90237 14.6834 4.29289 14.2929L8.58579 10L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L10 8.58579L14.2929 4.29289C14.6834 3.90237 15.3166 3.90237 15.7071 4.29289Z"
+                                fill="currentColor" />
+                        </svg>
+                        {% elif order.refund and order.refund.status_human in ['approved', 'completed'] %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z"
+                                fill="currentColor" />
+                        </svg>
+                        {% else %}
+                        <span>2</span>
+                        {% endif %}
+                    </div>
+                    <div class="stepper-title">
+                        {% if order.refund.status_human in ['approved', 'completed'] %}
+                        {% trans %}Request Approved{% endtrans %}
+                        {% elif order.refund.status_human == 'rejected' %}
+                        {% trans %}Request Rejected{% endtrans %}
+                        {% else %}
+                        {% trans %}Request Waiting Approval{% endtrans %}
+                        {% endif %}
+                    </div>
+                    {% if order.refund and order.refund.approved_at %}
+                    <div class="stepper-date" data-iso="{{ order.refund.approved_at.isoformat() }}">-</div>
+                    {% elif order.refund and order.refund.status_human in ['approved', 'rejected'] and
+                    order.refund.updated_at
+                    %}
+                    <div class="stepper-date" data-iso="{{ order.refund.updated_at.isoformat() }}">-</div>
+                    {% endif %}
+                </div>
+                <!-- Step 3: Return Parcel via DHL / Parcel Shipped -->
+                <div
+                    class="stepper-item {% if order.refund and order.refund.status_human == 'rejected' %}disabled{% elif order.refund and order.refund.status_human == 'completed' or (shipping_label and shipping_label.shipping_start_time) %}completed{% elif order.refund and order.refund.status_human == 'approved' %}active{% endif %}">
+                    <div class="stepper-counter">
+                        {% if order.refund and order.refund.status_human == 'completed' or (shipping_label and
+                        shipping_label.shipping_start_time) %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z"
+                                fill="currentColor" />
+                        </svg>
+                        {% else %}
+                        <span>3</span>
+                        {% endif %}
+                    </div>
+                    <div class="stepper-title">
+                        {% if shipping_label and shipping_label.shipping_start_time %}
+                        {% trans %}Parcel Shipped{% endtrans %}
+                        {% else %}
+                        {% trans %}Return Parcel via DHL{% endtrans %}
+                        {% endif %}
+                    </div>
+                    {% if shipping_label and shipping_label.shipping_start_time %}
+                    <div class="stepper-date" data-iso="{{ shipping_label.shipping_start_time.isoformat() }}">-</div>
+                    {% endif %}
+                </div>
+                <!-- Step 4: Waiting Delivery / Parcel Delivered to Seller -->
+                <div
+                    class="stepper-item {% if order.refund and order.refund.status_human == 'rejected' %}disabled{% elif order.refund and order.refund.status_human == 'completed' or (shipping_label and shipping_label.parcel_arrival_time) %}completed{% elif shipping_label and shipping_label.shipping_start_time %}active{% endif %}">
+                    <div class="stepper-counter">
+                        {% if order.refund and order.refund.status_human == 'completed' or (shipping_label and
+                        shipping_label.parcel_arrival_time) %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z"
+                                fill="currentColor" />
+                        </svg>
+                        {% else %}
+                        <span>4</span>
+                        {% endif %}
+                    </div>
+                    <div class="stepper-title">
+                        {% if shipping_label and shipping_label.parcel_arrival_time %}
+                        {% trans %}Parcel Delivered to Seller{% endtrans %}
+                        {% else %}
+                        {% trans %}Waiting Delivery{% endtrans %}
+                        {% endif %}
+                    </div>
+                    {% if shipping_label and shipping_label.parcel_arrival_time %}
+                    <div class="stepper-date" data-iso="{{ shipping_label.parcel_arrival_time.isoformat() }}">-</div>
+                    {% endif %}
+                </div>
+                <!-- Step 5: Refund Waiting Approval / Refund Processed -->
+                <div
+                    class="stepper-item {% if order.refund and order.refund.status_human == 'rejected' %}disabled{% elif order.refund and order.refund.status_human == 'completed' %}completed{% elif shipping_label and shipping_label.parcel_arrival_time %}active{% endif %}">
+                    <div class="stepper-counter">
+                        {% if order.refund and order.refund.status_human == 'completed' %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z"
+                                fill="currentColor" />
+                        </svg>
+                        {% else %}
+                        <span>5</span>
+                        {% endif %}
+                    </div>
+                    <div class="stepper-title">
+                        {% if order.refund and order.refund.status_human == 'completed' %}
+                        {% trans %}Refund Processed{% endtrans %}
+                        {% else %}
+                        {% trans %}Refund Waiting Approval{% endtrans %}
+                        {% endif %}
+                    </div>
+                    {% if order.refund and order.refund.refund_processed_at %}
+                    <div class="stepper-date" data-iso="{{ order.refund.refund_processed_at.isoformat() }}">-</div>
+                    {% elif order.refund and order.refund.status_human == 'completed' and order.refund.updated_at %}
+                    <div class="stepper-date" data-iso="{{ order.refund.updated_at.isoformat() }}">-</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if order.refund %}
+            <div class="stepper-timer mt-4 p-3 bg-light rounded">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <strong>{% trans %}Return Process Duration{% endtrans %}:</strong>
+                    </div>
+                    <div class="fw-bold">
+                        <span id="return-duration"
+                            data-start="{{ order.refund.created_at.isoformat() if order.refund.created_at }}"
+                            data-end="{% if order.refund.refund_processed_at %}{{ order.refund.refund_processed_at.isoformat() }}{% elif order.refund.status_human == 'completed' and order.refund.updated_at %}{{ order.refund.updated_at.isoformat() }}{% endif %}">
+                            {% if order.refund.created_at %}
+                            -
+                            {% else %}
+                            {% trans %}Not started yet{% endtrans %}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Normalize ISO string to ensure it has timezone info (assume UTC if missing)
+                function normalizeISO(isoString) {
+                    if (!isoString) return null;
+                    // If it doesn't end with Z or timezone offset, assume UTC
+                    if (!isoString.endsWith('Z') && !isoString.match(/[+-]\d{2}:\d{2}$/)) {
+                        // Remove any trailing microseconds if present
+                        isoString = isoString.replace(/\.\d+$/, '');
+                        return isoString + 'Z';
+                    }
+                    return isoString;
+                }
+
+                // Convert all timestamps to local timezone
+                function formatLocalDate(isoString) {
+                    var normalized = normalizeISO(isoString);
+                    if (!normalized) return '';
+                    var date = new Date(normalized);
+                    if (isNaN(date.getTime())) return '';
+
+                    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    var month = months[date.getMonth()];
+                    var day = date.getDate();
+                    var year = date.getFullYear();
+                    var hours = date.getHours().toString().padStart(2, '0');
+                    var minutes = date.getMinutes().toString().padStart(2, '0');
+
+                    return month + ' ' + day + ', ' + year + ' ' + hours + ':' + minutes;
+                }
+
+                // Update all date elements to local timezone
+                document.querySelectorAll('.stepper-date[data-iso]').forEach(function (el) {
+                    var isoString = el.getAttribute('data-iso');
+                    if (isoString) {
+                        el.textContent = formatLocalDate(isoString);
+                    }
+                });
+
+                // Update duration timer
+                var el = document.getElementById("return-duration");
+                if (!el) return;
+
+                var startStr = el.dataset.start;
+                var endStr = el.dataset.end;
+                if (!startStr) return;
+
+                // Normalize ISO strings to ensure proper UTC handling
+                startStr = normalizeISO(startStr);
+                if (endStr) {
+                    endStr = normalizeISO(endStr);
+                }
+
+                var start = new Date(startStr);
+                if (isNaN(start.getTime())) return;
+
+                // Calculate duration function (works with any two Date objects)
+                function calculateDuration(startDate, endDate) {
+                    var diffSec = Math.max(0, Math.floor((endDate - startDate) / 1000));
+
+                    var days = Math.floor(diffSec / 86400);
+                    var rem = diffSec % 86400;
+                    var hours = Math.floor(rem / 3600);
+                    rem = rem % 3600;
+                    // Round up minutes - if there's any partial minute, count it as a full minute
+                    var minutes = Math.ceil(rem / 60);
+
+                    var parts = [];
+                    if (days) {
+                        parts.push(days + " " + (days === 1 ? "day" : "days"));
+                    }
+                    if (hours) {
+                        parts.push(hours + " " + (hours === 1 ? "hour" : "hours"));
+                    }
+                    if (minutes || !parts.length) {
+                        parts.push(minutes + " min");
+                    }
+
+                    return parts.join(" ");
+                }
+
+                // If we already have an end time (refund processed), calculate duration
+                if (endStr) {
+                    var end = new Date(endStr);
+                    if (!isNaN(end.getTime())) {
+                        el.textContent = calculateDuration(start, end);
+                    }
+                    return;
+                }
+
+                // Otherwise, update live
+                function updateDuration() {
+                    var now = new Date();
+                    el.textContent = calculateDuration(start, now);
+                }
+
+                updateDuration();
+                // Update every minute while return process is in progress
+                setInterval(updateDuration, 60000);
+            });
+        </script>
+        {% endif %}
+        {% if shipping_label and order.refund and order.refund.status_human == "approved" %}
+        <div class="mt-4 text-center">
+            <h3>{% trans %}Return Shipping Label{% endtrans %}</h3>
+            <p class="text-muted">
+                {% trans %}Please print this shipping label and attach it to your return package.{% endtrans %}
+            </p>
+            <img src="{{ shipping_label.qr_code_path }}" alt="{% trans %}Return shipping QR code{% endtrans %}"
+                style="max-width: 260px;">
+            {% if shipping_label.tracking_number %}
+            <div class="mt-3">
+                <p class="mb-1">{% trans %}Tracking Number{% endtrans %}:
+                    <span class="fw-bold">{{ shipping_label.tracking_number }}</span>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% include "orders/_ordered_items_table.html" %}
+        <div class="order-notes">
+            {% if order.notes %}
+            <h2 class="order-notes__header">{% trans %}Your note{% endtrans %}</h2>
+            {% for note in order.notes %}
+            <p>{{ note.content }}</p>
+            {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock content %}
